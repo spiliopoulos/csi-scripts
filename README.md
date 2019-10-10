@@ -1,2 +1,2 @@
 # CSI Scripts
-Repo for various non production related scripts used in CSI team to power metric and dashbaord related functionalities.
+Various non production related scripts used in CSI team to power things like team metrics and dashbaord functionalities.
