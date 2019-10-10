@@ -1,7 +1,7 @@
 // This scripts fetches the tasks in Infra Oncall Pages (https://app.asana.com/0/62303611729063/list)
 // And does some aggregations and pushes the metrics to CSI Dashboards spreadsheet (https://docs.google.com/spreadsheets/d/1M-uj6JpefsTmYjKfTjr_RRfsT6H7NEumKXsf4TyIyh8/edit#gid=569554026) to create On-call metrics
 // To run this, you need to create a google script project, update access_token to a avlid API token, and have the run() method triggered daily in the corresponding Google project
-// Disclaimer: This is not a clean maintenable code, rather it's a dashboard script that just works. 
+// Disclaimer: This is not a clean maintainable code, rather it's a dashboard script that just works. 
 
 
 function getData(date) {
