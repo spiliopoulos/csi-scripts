@@ -1,3 +1,8 @@
+// This scripts fetches the tasks in CSI team sprint history (https://app.asana.com/0/412810785452798/list)
+// And does some aggregations and pushes the metrics to CSI Dashboard spreadsheet (https://docs.google.com/spreadsheets/d/1M-uj6JpefsTmYjKfTjr_RRfsT6H7NEumKXsf4TyIyh8/edit#gid=569554026) to create sprint metrics
+// To run this, you need to create a google script project, update access_token to a avlid API token, and have it trigger run() method daily in the corresponding Google project
+// Disclaimer: This is not a clean maintenable code, rather it's a dashboard script that just works. 
+
 function getData(date) {
   var access_token = "YOUR API TOKEN"
   if (typeof date === "undefined") {
