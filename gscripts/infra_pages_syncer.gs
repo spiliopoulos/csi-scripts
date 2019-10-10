@@ -28,7 +28,7 @@ function writeToSheet(sheet, sheet2) {
   var tasks = [];
   var shouldContinue=true
   
-  // Load the last 500 tasks
+  // Load the last 1200 tasks
   for (var count=0; count <12; count++) {
       for (var i=0; i < data.length; i++) {
            tasks.push(data[i]);
