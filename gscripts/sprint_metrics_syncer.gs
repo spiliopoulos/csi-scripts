@@ -19,7 +19,7 @@ function getData(date) {
 }
 
 
-function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5) {
+function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5, sheet6) {
   var result = getData();
   var data = result.data;
   var tasks = [];
@@ -62,7 +62,9 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5) {
   var epics =[]
   var sprintsToAssignee = []
   var sprintsToEpics = []
+  var sprintsToPriority = []
   var headers = []
+  var prioroties = []
   
   headers.push(['id', 'Sprint', 'Created', 'Assignee', 'Points', 'Completed Date', 'Quarter', 'Epic', 'Day of Completion', 'isPresent'])
   sheet.getRange(sheet.getLastRow()+1, 1, 1, 10).setValues(headers)
@@ -77,6 +79,7 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5) {
      var quarter= 'N/A'
      var sprint= 'N/A'
      var assignee = 'N/A'
+     var priority = 'Not Assigned'
 
      if (task.assignee!=null) {
        assignee = task.assignee.name
@@ -91,6 +94,9 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5) {
       }      
       if (task.custom_fields[j].gid == '1138863591702579' && task.custom_fields[j].enum_value != null){
         quarter = task.custom_fields[j].enum_value.name 
+      }
+      if (task.custom_fields[j].gid == '1140922384836794' && task.custom_fields[j].enum_value != null){
+        priority = task.custom_fields[j].enum_value.name 
       }
     }
     
@@ -125,6 +131,13 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5) {
     }
     epics[epic_index] = [epic, epics[epic_index][1] + points]
     
+    var prioroty_index = getBucket(prioroties, priority);
+    if (prioroty_index == -1) {
+     prioroties.push([priority, 0]) 
+     prioroty_index= prioroty_index.length -1 
+    }
+    
+    
     var sprint_index = getBucket(sprints, sprint);
     if (sprint_index == -1) {
      sprints.push([sprint, 0, 0, 0, 0]) 
@@ -147,6 +160,23 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5) {
     
     sprintsToEpics[sprint_epic_index][1][epic_index] = [epic,  sprintsToEpics[sprint_epic_index][1][epic_index][1] + points]
     
+    // Update priority per sprint 
+     Logger.log('priroity ---- ' + priority)
+    var sprint_priority_index = getBucket(sprintsToPriority, sprint);
+    if (sprint_priority_index == -1) {
+     sprintsToPriority.push([sprint, []]) 
+     sprint_priority_index= sprintsToPriority.length -1 
+    }
+    
+    var priority_index = getBucket(sprintsToPriority[sprint_priority_index][1], priority);
+    if (priority_index == -1) {
+     var all_prioritties = sprintsToPriority[sprint_priority_index][1]
+     all_prioritties.push([priority, 0])
+     priority_index= all_prioritties.length -1 
+    }
+    
+    sprintsToPriority[sprint_priority_index][1][priority_index] = [priority,  sprintsToPriority[sprint_priority_index][1][priority_index][1] + points]
+    Logger.log('priroity array ---- ' + sprintsToPriority)
     
     
     // Find Unique engineers
@@ -230,6 +260,53 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5) {
    sheet4.getRange(sheet4.getLastRow()+1, 1, 1, headers.length).setValues([headers])
   
    sheet4.getRange(sheet4.getLastRow()+1, 1, sprint_epics_data.length, headers.length).setValues(sprint_epics_data)
+   
+   
+   // Push Priority Per Sprint Metrics
+   headers = []
+  
+   headers = ['Sprint']
+   for (var i=0; i < sprintsToPriority.length; i++) {
+     for (j=0; j<sprintsToPriority[i][1].length; j++) {
+       if (!findInArray(headers, sprintsToPriority[i][1][j][0])) {
+         var priority_header = sprintsToPriority[i][1][j][0] + ''
+        headers.push(priority_header) 
+       }
+       
+     }
+     
+   }
+  
+
+  var sprint_prioroties_data=[]
+  
+     for (var i=0; i < sprintsToPriority.length; i++) {
+       sprint_prioroties_data.push([sprintsToPriority[i][0]])
+       for (var header_counter =1; header_counter<headers.length; header_counter++) {
+         var found = false
+         var sum =0
+          for (j=0; j<sprintsToPriority[i][1].length; j++) {
+            sum = sum + sprintsToPriority[i][1][j][1]
+          }
+         for (j=0; j<sprintsToPriority[i][1].length; j++) {
+           var priority= sprintsToPriority[i][1][j][0]
+           if (priority == headers[header_counter]) {
+                  sprint_prioroties_data[sprint_prioroties_data.length-1].push(Math.round(100 * (sprintsToPriority[i][1][j][1]/sum)))
+                  found = true
+             }
+          }
+         if (found == false) {
+           sprint_prioroties_data[sprint_prioroties_data.length-1].push(0)
+         }
+       }
+       
+     }
+     
+  
+  
+   sheet6.getRange(sheet6.getLastRow()+1, 1, 1, headers.length).setValues([headers])
+  
+   sheet6.getRange(sheet6.getLastRow()+1, 1, sprint_prioroties_data.length, headers.length).setValues(sprint_prioroties_data)
   
 
 
@@ -274,7 +351,10 @@ function run() {
   sheet4.clear();
    var sheet5 = SpreadsheetApp.openById(spreadsheetId).getSheetByName("epics-aggregated");
   sheet5.clear();
+   var sheet6 = SpreadsheetApp.openById(spreadsheetId).getSheetByName("sprint-prioroties");
+  sheet6.clear();
   Logger.log('Start script')
-  writeToSheet(sheet, sheet2, sheet3, sheet4, sheet5)  
+  writeToSheet(sheet, sheet2, sheet3, sheet4, sheet5, sheet6) 
+  Logger.log('script completed')
 }
 
