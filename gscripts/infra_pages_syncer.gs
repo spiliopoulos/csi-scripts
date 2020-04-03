@@ -22,16 +22,27 @@ function getData(date) {
 }
 
 
-function writeToSheet(sheet, sheet2) {
+
+function writeToSheet(sheet, sheet2, startDate) {
   var result = getData();
   var data = result.data;
   var tasks = [];
   var shouldContinue=true
   
-  // Load the last 1200 tasks
+  // Load the last 500 tasks
   for (var count=0; count <12; count++) {
       for (var i=0; i < data.length; i++) {
-           tasks.push(data[i]);
+           if (typeof startDate === "undefined") {
+             Logger.log('Undefined')
+             tasks.push(data[i]);
+           } else {
+             var onCallRange = getRange2(startDate)
+             Logger.log('Check ---- ' + '---' + onCallRange[0] + '---' + onCallRange[1] + '------' + startDate)
+             
+             if ((new Date(data[i].created_at).getTime() >= onCallRange[0].getTime()) && (new Date(data[i].created_at).getTime() <= onCallRange[1].getTime()) ) {
+               tasks.push(data[i]);
+             }
+           }
       }
     
     Logger.log('Paging ---- ' + '---' + data[data.length-1].gid + '---' + data[data.length-1].modified_at)
@@ -162,12 +173,12 @@ function getRange(date1) {
   var start
   var end
   var date = new Date(date1.getTime())
-  if (date.getDay!=2 || (date.getDay==2 && date.getHours() < 13)) {
+  if (date.getDay()!=2 || (date.getDay()==2 && date.getHours() > 13)) {
      date.setHours(13)
      date.setMinutes(00)
      date.setSeconds(0)
      var subtract = date.getDay()-2
-     if (subtract < 1)
+     if (subtract < 0)
        subtract=subtract + 7
      start = subtractDays(date, subtract)
      end = addDays(start, 7)
@@ -187,21 +198,23 @@ function getRange2(date1) {
   var start
   var end
   var date = new Date(date1.getTime())
-  if (date.getDay!=2 || (date.getDay==2 && date.getHours() < 13)) {
+  if (date.getDay()!=2 || (date.getDay()==2 && (date.getHours() > 13))) {
      date.setHours(13)
      date.setMinutes(00)
      date.setSeconds(0)
      var subtract = date.getDay()-2
-     if (subtract < 1)
+     if (subtract < 0)
        subtract=subtract + 7
      start = subtractDays(date, subtract)
      end = addDays(start, 7)
+      Logger.log('date22 ---- ' + start + '----'  + end + '---' + date1)
   } else {
     date.setHours(13)
     date.setMinutes(00)
     date.setSeconds(0)
     end = date
     start = subtractDays(end, 7)
+    Logger.log('date ---- ' + start + '----'  + end + '---' + date1)
   }
    //Logger.log('date ---- ' + date1 + '-----' + date1.getDay() +   '-----' +start + '-----' + end)
  return [start, end, 0, 0]
@@ -234,4 +247,17 @@ function run() {
   sheet2.clear();
   writeToSheet(sheet, sheet2)  
 }
+
+function runLastWeek() {
+  var spreadsheetId = '1M-uj6JpefsTmYjKfTjr_RRfsT6H7NEumKXsf4TyIyh8';
+  var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName("infra-oncall-raw-last-week");
+  sheet.clear();
+  var sheet2 = SpreadsheetApp.openById(spreadsheetId).getSheetByName("infra-weeks-counts-last-week");
+  sheet2.clear();
+  var d = new Date();
+  d.setDate(d.getDate()-7);
+  //getRange2(d)
+  writeToSheet(sheet, sheet2, d)  
+}
+
 
