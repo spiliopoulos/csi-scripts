@@ -201,6 +201,21 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5, sheet6) {
     buckets.push([task.gid, sprint, created, assignee, points, task.completed_at,  quarter, epic, completed.getDay(), 1])
   }
      
+  
+  //sort sprints
+     for (var i=0; i < sprints.length-1; i++) {
+     for (j=0; j<sprints.length-i-1; j++) {
+       
+       if (compareSprints(sprints[j][0],sprints[j+1][0])) {
+        var tmp = sprints[j]
+        sprints[j]= sprints[j+1]
+        sprints[j+1]=tmp
+       }
+     }
+     
+   }
+  
+  
      sheet.getRange(sheet.getLastRow()+1, 1, buckets.length, 10).setValues(buckets);
 
   
@@ -255,6 +270,18 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5, sheet6) {
        
      }
      
+    //sort sprints epics data
+     for (var i=0; i < sprint_epics_data.length-1; i++) {
+     for (j=0; j<sprint_epics_data.length-i-1; j++) {
+       
+       if (compareSprints(sprint_epics_data[j][0],sprint_epics_data[j+1][0])) {
+        var tmp = sprint_epics_data[j]
+        sprint_epics_data[j]= sprint_epics_data[j+1]
+        sprint_epics_data[j+1]=tmp
+       }
+     }
+     
+   }
   
   
    sheet4.getRange(sheet4.getLastRow()+1, 1, 1, headers.length).setValues([headers])
@@ -303,6 +330,19 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5, sheet6) {
      }
      
   
+      //sort sprints priroity data
+     for (var i=0; i < sprint_prioroties_data.length-1; i++) {
+     for (j=0; j<sprint_prioroties_data.length-i-1; j++) {
+       
+       if (compareSprints(sprint_prioroties_data[j][0],sprint_prioroties_data[j+1][0])) {
+        var tmp = sprint_prioroties_data[j]
+        sprint_prioroties_data[j]= sprint_prioroties_data[j+1]
+        sprint_prioroties_data[j+1]=tmp
+       }
+     }
+     
+   }
+  
   
    sheet6.getRange(sheet6.getLastRow()+1, 1, 1, headers.length).setValues([headers])
   
@@ -338,6 +378,21 @@ function diffDays(date1, date2){
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
+function compareSprints(sprint1, sprint2){
+  const paragraph = 'e24 sprint 53, 10/7 -10/18';
+  const regex = /e.*(\d\d).*sprint\s*([0-9]+).*,.*/;
+  const sprint1match = sprint1.toLowerCase().match(regex);
+  const sprint2match = sprint2.toLowerCase().match(regex);
+  Logger.log('Sprints;;;;;;; ' + sprint1 + " " + sprint2  + sprint1match + sprint2match )
+  if (parseInt(sprint1match[1]) < parseInt(sprint2match[1])){
+    return true
+  }
+  else if (parseInt(sprint1match[1]) > parseInt(sprint2match[1])) {
+   return false 
+  }
+  return parseInt(sprint1match[2]) < parseInt(sprint2match[2])
+}
+
 
 function run() {
   var spreadsheetId = '1M-uj6JpefsTmYjKfTjr_RRfsT6H7NEumKXsf4TyIyh8';
@@ -357,4 +412,3 @@ function run() {
   writeToSheet(sheet, sheet2, sheet3, sheet4, sheet5, sheet6) 
   Logger.log('script completed')
 }
-
