@@ -21,7 +21,6 @@ function getData(date) {
   return data;
 }
 
-
 function writeToSheet(sheet) {
   var result = getData();
   var data = result.data;
@@ -29,7 +28,7 @@ function writeToSheet(sheet) {
   var shouldContinue=true
   
   // Load the last 3000 tasks
-  for (var count=0; count < 30; count++) {
+  for (var count=0; count < 100; count++) {
       for (var i=0; i < data.length; i++) {
         if (new Date(data[i].created_at).getYear()>=2019) {
             //shouldContinue=false 
@@ -38,6 +37,7 @@ function writeToSheet(sheet) {
            
       }
     Logger.log('Paging ---- ' + '---' + data[data.length-1].gid + '---' + data[data.length-1].modified_at)
+    Utilities.sleep(100)
     result=getData(new Date(data[data.length-1].modified_at))
     data = result.data
   }
