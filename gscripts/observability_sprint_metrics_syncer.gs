@@ -1,11 +1,16 @@
 // This scripts fetches the tasks in Observability team sprint history (https://app.asana.com/0/1171879688342615/list)
 // And does some aggregations and pushes the metrics to Observability Dashboard spreadsheet (https://docs.google.com/spreadsheets/d/1MPVcXWAy5LNZS9MJRZvBOVxHhwcEioBLiQ2TWg_E_k4/edit#gid=569554026) to create sprint metrics
-// To run this, you need to create a google script project, update access_token to a avlid API token, and have it trigger run() method daily in the corresponding Google project
+// To run this you need to:
+//   * create a new google script project (script.google.com),
+//   * create a new Asana Personal Access Token (https://app.asana.com/0/developer-console)
+//   * update ASANA_PAT to the token you created in the previous step,
+//   * add a daily trigger for the run() method daily
 // Disclaimer: This is not a clean maintainable code, rather it's a dashboard script that just works. 
 
+const ASANA_PAT = "YOUR API TOKEN";
 
 function getData(date) {
-  var access_token = "YOUR API TOKEN"
+  var access_token = ASANA_PAT
   if (typeof date === "undefined") {
     date = new Date();
   }
