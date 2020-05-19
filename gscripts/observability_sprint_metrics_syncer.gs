@@ -88,7 +88,7 @@ function writeToSheet(sheet, sheet2,sheet3, sheet4, sheet5, sheet6) {
      
      for (var j = 0; j < task.custom_fields.length; j++){
       if (task.custom_fields[j].gid == '1171882640055901' && task.custom_fields[j].enum_value != null){
-        points = parseInt(task.custom_fields[j].enum_value.name)
+        points = parseFloat(task.custom_fields[j].enum_value.name)
       }
       if (task.custom_fields[j].gid == '1171882813926829' && task.custom_fields[j].enum_value != null){
         epic = task.custom_fields[j].enum_value.name 
